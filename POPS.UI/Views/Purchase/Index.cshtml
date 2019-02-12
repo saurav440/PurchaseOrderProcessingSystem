@@ -1,0 +1,90 @@
+﻿@model IEnumerable<POPS.API.Models.Item>
+
+@{
+    ViewBag.Title = "Purchase Order Prcessing System";
+}
+
+<div class="jumbotron">
+    <h2>@ViewBag.Title</h2>
+</div>
+<div class="row">
+    <table class="table table-bordered">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemCode)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemDesc)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ItemRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SuppNo)
+            </th>
+            <th>Qty</th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+            {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemCode,new { @class="itemcode"})
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemDesc)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ItemRate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SuppNo ,new { @class = "supno" })
+                </td>
+                <td>
+                    <input type="number" class="form-control quantity" id="quantity-ordered" value=""/>
+                </td>
+                <td>
+                   <input id="buttonOrder" type="button" class="btn btn-sm btn-primary btnorder" value="Order"/>
+                </td>
+            </tr>
+        }
+        <tr>
+            <td>
+                @Html.ValidationSummary(true, "", new {@class="text-danger" })
+            </td>
+        </tr>
+    </table>
+</div>
+<script>
+    $(document).ready(function () {
+        
+    });
+
+    $('.btnorder').click(function (event) {
+        event.preventDefault();
+        var row = $(this).closest('tr');
+        var qty = row.find('.quantity').val();
+        var itemcode = row[0].cells[0].innerText;
+        var supno = row[0].cells[3].innerText;
+
+        if (qty != '' || qty != '0') {
+            $.ajax({
+                type: "POST",
+                url: "http://localhost/POPS/api/Add",
+                data: { ItemCode: itemcode, SupCode: supno, Qty: qty },
+                datatype: 'application/json',
+                success: function (data) {
+                    if (data) {
+                        window.location.href = "http://localhost/POPS.UI/Purchase/OrderSummary"
+                    }
+                },
+                error: function (xhr) { alert("Error occurs") }
+            })
+        } else {
+            alert('Enter quantity')
+        }
+    });
+</script>
+
+
